@@ -48,6 +48,7 @@ function App() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [selectedSetlist, setSelectedSetlist] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
   
   const { isAdmin, logout } = useAuth();
 
@@ -68,12 +69,11 @@ function App() {
     }
   }, [setlists]);
 
-  // Agregar efecto para cerrar menús al hacer clic fuera
+  // Efecto para cerrar el menú cuando se hace clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!event.target.closest('[data-setlist-id]')) {
-        const allMenus = document.querySelectorAll('[data-setlist-menu]');
-        allMenus.forEach(menu => menu.classList.add('hidden'));
+      if (!event.target.closest('.setlist-menu-container')) {
+        setOpenMenuId(null);
       }
     };
 
@@ -242,7 +242,7 @@ function App() {
                       key={setlist.id}
                       className={`flex items-center justify-between group px-4 py-2 rounded-lg hover:bg-gray-800 ${
                         selectedSetlist?.id === setlist.id ? 'bg-gray-800' : ''
-                      } cursor-pointer relative`}
+                      } cursor-pointer`}
                     >
                       <div 
                         className="flex items-center space-x-3 flex-1"
@@ -262,38 +262,28 @@ function App() {
                         </div>
                       </div>
                       {isAdmin && (
-                        <div className="relative">
+                        <div className="setlist-menu-container relative">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              const currentSetlist = e.currentTarget.closest('[data-setlist-id]');
-                              const allMenus = document.querySelectorAll('[data-setlist-menu]');
-                              allMenus.forEach(menu => {
-                                if (menu.dataset.setlistId !== currentSetlist.dataset.setlistId) {
-                                  menu.classList.add('hidden');
-                                }
-                              });
-                              const menu = currentSetlist.querySelector('[data-setlist-menu]');
-                              menu.classList.toggle('hidden');
+                              setOpenMenuId(openMenuId === setlist.id ? null : setlist.id);
                             }}
-                            className="p-1 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-700"
                           >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                               <path fill="currentColor" d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"/>
                             </svg>
                           </button>
-                          <div 
-                            data-setlist-menu
-                            data-setlist-id={setlist.id}
-                            className="hidden absolute right-0 mt-1 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-lg z-50"
-                          >
-                            <div className="py-1">
+                          {openMenuId === setlist.id && (
+                            <div 
+                              className="absolute right-0 mt-1 w-48 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-50 py-1"
+                            >
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setEditingSetlist(setlist);
                                   setShowSetlistForm(true);
-                                  e.currentTarget.closest('[data-setlist-menu]').classList.add('hidden');
+                                  setOpenMenuId(null);
                                 }}
                                 className="w-full px-4 py-2 text-sm text-left text-white hover:bg-gray-800 flex items-center space-x-2"
                               >
@@ -306,7 +296,7 @@ function App() {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleDeleteSetlist(setlist.id);
-                                  e.currentTarget.closest('[data-setlist-menu]').classList.add('hidden');
+                                  setOpenMenuId(null);
                                 }}
                                 className="w-full px-4 py-2 text-sm text-left text-white hover:bg-gray-800 flex items-center space-x-2"
                               >
@@ -316,7 +306,7 @@ function App() {
                                 <span>Eliminar</span>
                               </button>
                             </div>
-                          </div>
+                          )}
                         </div>
                       )}
                     </div>

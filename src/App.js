@@ -68,6 +68,19 @@ function App() {
     }
   }, [setlists]);
 
+  // Agregar efecto para cerrar menús al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('[data-setlist-id]')) {
+        const allMenus = document.querySelectorAll('[data-setlist-menu]');
+        allMenus.forEach(menu => menu.classList.add('hidden'));
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const filteredSongs = selectedSetlist 
     ? songs.filter(song => selectedSetlist.songs.includes(song.id))
     : songs.filter(song => {
@@ -227,15 +240,17 @@ function App() {
                   {setlists.map((setlist) => (
                     <div
                       key={setlist.id}
-                      onClick={() => {
-                        setSelectedSetlist(selectedSetlist?.id === setlist.id ? null : setlist);
-                        setShowMobileMenu(false);
-                      }}
                       className={`flex items-center justify-between group px-4 py-2 rounded-lg hover:bg-gray-800 ${
                         selectedSetlist?.id === setlist.id ? 'bg-gray-800' : ''
-                      } cursor-pointer`}
+                      } cursor-pointer relative`}
                     >
-                      <div className="flex items-center space-x-3">
+                      <div 
+                        className="flex items-center space-x-3 flex-1"
+                        onClick={() => {
+                          setSelectedSetlist(selectedSetlist?.id === setlist.id ? null : setlist);
+                          setShowMobileMenu(false);
+                        }}
+                      >
                         <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
                           <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24">
                             <path fill="currentColor" d="M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z"/>
@@ -247,30 +262,61 @@ function App() {
                         </div>
                       </div>
                       {isAdmin && (
-                        <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100">
+                        <div className="relative">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setEditingSetlist(setlist);
-                              setShowSetlistForm(true);
+                              const currentSetlist = e.currentTarget.closest('[data-setlist-id]');
+                              const allMenus = document.querySelectorAll('[data-setlist-menu]');
+                              allMenus.forEach(menu => {
+                                if (menu.dataset.setlistId !== currentSetlist.dataset.setlistId) {
+                                  menu.classList.add('hidden');
+                                }
+                              });
+                              const menu = currentSetlist.querySelector('[data-setlist-menu]');
+                              menu.classList.toggle('hidden');
                             }}
-                            className="p-1 text-gray-400 hover:text-white"
+                            className="p-1 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
                           >
-                            <svg className="w-4 h-4" viewBox="0 0 24 24">
-                              <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            <svg className="w-5 h-5" viewBox="0 0 24 24">
+                              <path fill="currentColor" d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"/>
                             </svg>
                           </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteSetlist(setlist.id);
-                            }}
-                            className="p-1 text-gray-400 hover:text-red-500"
+                          <div 
+                            data-setlist-menu
+                            data-setlist-id={setlist.id}
+                            className="hidden absolute right-0 mt-1 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-lg z-50"
                           >
-                            <svg className="w-4 h-4" viewBox="0 0 24 24">
-                              <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                            </svg>
-                          </button>
+                            <div className="py-1">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingSetlist(setlist);
+                                  setShowSetlistForm(true);
+                                  e.currentTarget.closest('[data-setlist-menu]').classList.add('hidden');
+                                }}
+                                className="w-full px-4 py-2 text-sm text-left text-white hover:bg-gray-800 flex items-center space-x-2"
+                              >
+                                <svg className="w-4 h-4" viewBox="0 0 24 24">
+                                  <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                                <span>Editar</span>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteSetlist(setlist.id);
+                                  e.currentTarget.closest('[data-setlist-menu]').classList.add('hidden');
+                                }}
+                                className="w-full px-4 py-2 text-sm text-left text-white hover:bg-gray-800 flex items-center space-x-2"
+                              >
+                                <svg className="w-4 h-4" viewBox="0 0 24 24">
+                                  <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                                <span>Eliminar</span>
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>

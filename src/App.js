@@ -47,6 +47,7 @@ function App() {
   const [editingSetlist, setEditingSetlist] = useState(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [selectedSetlist, setSelectedSetlist] = useState(null);
   
   const { isAdmin, logout } = useAuth();
 
@@ -67,19 +68,21 @@ function App() {
     }
   }, [setlists]);
 
-  const filteredSongs = songs.filter(song => {
-    const matchesSearch = song.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         song.artist.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
-  }).sort((a, b) => {
-    if (!sortBy) return 0;
-    const aValue = a[sortBy] || '';
-    const bValue = b[sortBy] || '';
-    if (sortBy === 'bpm') {
-      return (Number(aValue) || 0) - (Number(bValue) || 0);
-    }
-    return aValue.toString().localeCompare(bValue.toString());
-  });
+  const filteredSongs = selectedSetlist 
+    ? songs.filter(song => selectedSetlist.songs.includes(song.id))
+    : songs.filter(song => {
+        const matchesSearch = song.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           song.artist.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesSearch;
+      }).sort((a, b) => {
+        if (!sortBy) return 0;
+        const aValue = a[sortBy] || '';
+        const bValue = b[sortBy] || '';
+        if (sortBy === 'bpm') {
+          return (Number(aValue) || 0) - (Number(bValue) || 0);
+        }
+        return aValue.toString().localeCompare(bValue.toString());
+      });
 
   const handleSaveSong = (song) => {
     if (song.id) {
@@ -126,11 +129,19 @@ function App() {
 
   return (
     <div className="flex min-h-screen bg-black text-white">
+      {/* Overlay para móvil */}
+      {showMobileMenu && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setShowMobileMenu(false)}
+        />
+      )}
+      
       {/* Menú lateral y móvil */}
-      <div className={`${showMobileMenu ? 'fixed inset-0 z-50 bg-black bg-opacity-75' : ''} md:relative`}>
+      <div className="md:relative">
         <div className={`w-64 fixed h-full bg-black border-r border-gray-800 transform transition-transform duration-200 ease-in-out ${
           showMobileMenu ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        }`}>
+        } z-50`}>
           <div className="p-6">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center space-x-2">
@@ -139,7 +150,10 @@ function App() {
               </div>
               <button 
                 className="md:hidden text-gray-400 hover:text-white"
-                onClick={() => setShowMobileMenu(false)}
+                onClick={() => {
+                  setShowMobileMenu(false);
+                  // No reseteamos el setlist seleccionado al cerrar el menú
+                }}
               >
                 <svg className="w-6 h-6" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -182,6 +196,60 @@ function App() {
                       </svg>
                       <span>Nuevo setlist</span>
                     </button>
+                    
+                    <div className="mt-4 space-y-2">
+                      {setlists.map((setlist) => (
+                        <div
+                          key={setlist.id}
+                          onClick={() => {
+                            setSelectedSetlist(selectedSetlist?.id === setlist.id ? null : setlist);
+                            setShowMobileMenu(false);
+                          }}
+                          className={`flex items-center justify-between group px-4 py-2 rounded-lg hover:bg-gray-800 ${
+                            selectedSetlist?.id === setlist.id ? 'bg-gray-800' : ''
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
+                              <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z"/>
+                              </svg>
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-white">{setlist.name}</div>
+                              <div className="text-xs text-gray-400">{setlist.songs.length} canciones</div>
+                            </div>
+                          </div>
+                          {isAdmin && (
+                            <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingSetlist(setlist);
+                                  setShowSetlistForm(true);
+                                }}
+                                className="p-1 text-gray-400 hover:text-white"
+                              >
+                                <svg className="w-4 h-4" viewBox="0 0 24 24">
+                                  <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteSetlist(setlist.id);
+                                }}
+                                className="p-1 text-gray-400 hover:text-red-500"
+                              >
+                                <svg className="w-4 h-4" viewBox="0 0 24 24">
+                                  <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <button
@@ -223,7 +291,21 @@ function App() {
                   <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
                 </svg>
               </button>
-              <h1 className="text-2xl font-bold">Canciones</h1>
+              <div className="flex items-center space-x-4">
+                <h1 className="text-2xl font-bold">
+                  {selectedSetlist ? selectedSetlist.name : 'Canciones'}
+                </h1>
+                {selectedSetlist && (
+                  <button
+                    onClick={() => setSelectedSetlist(null)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
             <div className="w-full md:w-auto flex items-stretch gap-4">
               <div className="flex-1 md:w-64">

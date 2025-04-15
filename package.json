@@ -11,11 +11,15 @@
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "tailwindcss": "^3.4.1",
-    "tone": "^14.7.77"
+    "tone": "^14.7.77",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "tailwind-merge": "^2.2.1",
+    "react-beautiful-dnd": "^13.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "CI=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

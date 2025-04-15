@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { mockSongs, mockSetlists } from './mock/data';
 import SongList from './components/SongList';
 import PlayerModal from './components/PlayerModal';
@@ -10,8 +10,16 @@ import SortFilter from './components/SortFilter';
 import { useAuth } from './context/AuthContext';
 
 function App() {
-  const [songs, setSongs] = useState(mockSongs);
-  const [setlists, setSetlists] = useState(mockSetlists);
+  const [songs, setSongs] = useState(() => {
+    const savedSongs = localStorage.getItem('songs');
+    return savedSongs ? JSON.parse(savedSongs) : mockSongs;
+  });
+  
+  const [setlists, setSetlists] = useState(() => {
+    const savedSetlists = localStorage.getItem('setlists');
+    return savedSetlists ? JSON.parse(savedSetlists) : mockSetlists;
+  });
+
   const [selectedSong, setSelectedSong] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('');
@@ -24,23 +32,26 @@ function App() {
   
   const { isAdmin, logout } = useAuth();
 
+  // Guardar en localStorage cuando cambien los datos
+  useEffect(() => {
+    localStorage.setItem('songs', JSON.stringify(songs));
+  }, [songs]);
+
+  useEffect(() => {
+    localStorage.setItem('setlists', JSON.stringify(setlists));
+  }, [setlists]);
+
   const filteredSongs = songs.filter(song => {
     const matchesSearch = song.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          song.artist.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   }).sort((a, b) => {
-    if (!sortBy) return 0; // No ordenar si no hay criterio seleccionado
-    
-    // Manejar valores nulos o undefined
+    if (!sortBy) return 0;
     const aValue = a[sortBy] || '';
     const bValue = b[sortBy] || '';
-    
-    // Ordenar números
     if (sortBy === 'bpm') {
       return (Number(aValue) || 0) - (Number(bValue) || 0);
     }
-    
-    // Ordenar texto
     return aValue.toString().localeCompare(bValue.toString());
   });
 
@@ -67,6 +78,11 @@ function App() {
   const handleDeleteSong = (songId) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta canción?')) {
       setSongs(songs.filter(s => s.id !== songId));
+      // También eliminar la canción de los setlists
+      setSetlists(setlists.map(setlist => ({
+        ...setlist,
+        songs: setlist.songs.filter(id => id !== songId)
+      })));
     }
   };
 
@@ -79,7 +95,6 @@ function App() {
   const handleAddToSetlist = (setlistId, songIds) => {
     setSetlists(setlists.map(setlist => {
       if (setlist.id === setlistId) {
-        // Filtrar canciones duplicadas
         const newSongs = [...new Set([...setlist.songs, ...songIds])];
         return { ...setlist, songs: newSongs };
       }

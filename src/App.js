@@ -11,13 +11,31 @@ import { useAuth } from './context/AuthContext';
 
 function App() {
   const [songs, setSongs] = useState(() => {
-    const savedSongs = localStorage.getItem('songs');
-    return savedSongs ? JSON.parse(savedSongs) : mockSongs;
+    try {
+      const savedSongs = localStorage.getItem('songs');
+      if (savedSongs) {
+        const parsed = JSON.parse(savedSongs);
+        return Array.isArray(parsed) ? parsed : mockSongs;
+      }
+    } catch (error) {
+      console.error('Error al cargar canciones:', error);
+      localStorage.removeItem('songs');
+    }
+    return mockSongs;
   });
   
   const [setlists, setSetlists] = useState(() => {
-    const savedSetlists = localStorage.getItem('setlists');
-    return savedSetlists ? JSON.parse(savedSetlists) : mockSetlists;
+    try {
+      const savedSetlists = localStorage.getItem('setlists');
+      if (savedSetlists) {
+        const parsed = JSON.parse(savedSetlists);
+        return Array.isArray(parsed) ? parsed : mockSetlists;
+      }
+    } catch (error) {
+      console.error('Error al cargar setlists:', error);
+      localStorage.removeItem('setlists');
+    }
+    return mockSetlists;
   });
 
   const [selectedSong, setSelectedSong] = useState(null);
@@ -34,11 +52,19 @@ function App() {
 
   // Guardar en localStorage cuando cambien los datos
   useEffect(() => {
-    localStorage.setItem('songs', JSON.stringify(songs));
+    try {
+      localStorage.setItem('songs', JSON.stringify(songs));
+    } catch (error) {
+      console.error('Error al guardar canciones:', error);
+    }
   }, [songs]);
 
   useEffect(() => {
-    localStorage.setItem('setlists', JSON.stringify(setlists));
+    try {
+      localStorage.setItem('setlists', JSON.stringify(setlists));
+    } catch (error) {
+      console.error('Error al guardar setlists:', error);
+    }
   }, [setlists]);
 
   const filteredSongs = songs.filter(song => {

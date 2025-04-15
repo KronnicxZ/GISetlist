@@ -15,6 +15,7 @@ const BibleVerse = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedVersion, setSelectedVersion] = useState('RVR1960');
+  const [showVersionMenu, setShowVersionMenu] = useState(false);
 
   // Efecto para seleccionar un versículo aleatorio al montar el componente
   useEffect(() => {
@@ -107,18 +108,39 @@ const BibleVerse = () => {
             </p>
             {error && <p className="text-red-400 text-xs">{error}</p>}
           </div>
-          <div className="flex justify-end">
-            <select
-              value={selectedVersion}
-              onChange={(e) => setSelectedVersion(e.target.value)}
-              className="bg-transparent text-gray-400 text-xs border-none focus:outline-none cursor-pointer hover:text-white transition-colors"
-            >
-              <option value="RVR1960">RVR1960</option>
-              <option value="NVI">NVI</option>
-              <option value="LBLA">LBLA</option>
-              <option value="RVA">RVA</option>
-              <option value="PDT">PDT</option>
-            </select>
+          <div className="flex justify-end relative">
+            <div className="group">
+              <button
+                onClick={() => setShowVersionMenu(!showVersionMenu)}
+                className="text-gray-400 hover:text-white transition-colors text-xs flex items-center space-x-1"
+                title={`Versión actual: ${selectedVersion}`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <span className="text-xs">{selectedVersion}</span>
+              </button>
+              {showVersionMenu && (
+                <div className="absolute right-0 mt-2 w-32 bg-gray-800 rounded-md shadow-lg py-1 z-10">
+                  {Object.keys(BIBLE_VERSIONS).map((version) => (
+                    <button
+                      key={version}
+                      onClick={() => {
+                        setSelectedVersion(version);
+                        setShowVersionMenu(false);
+                      }}
+                      className={`block w-full text-left px-4 py-2 text-xs ${
+                        selectedVersion === version
+                          ? 'text-[#FBAE00] bg-gray-700'
+                          : 'text-gray-300 hover:bg-gray-700'
+                      }`}
+                    >
+                      {version}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

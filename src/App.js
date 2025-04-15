@@ -102,20 +102,16 @@ function App() {
   };
 
   const handleDeleteSong = (songId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta canción?')) {
-      setSongs(songs.filter(s => s.id !== songId));
-      // También eliminar la canción de los setlists
-      setSetlists(setlists.map(setlist => ({
-        ...setlist,
-        songs: setlist.songs.filter(id => id !== songId)
-      })));
-    }
+    setSongs(songs.filter(s => s.id !== songId));
+    // También eliminar la canción de los setlists
+    setSetlists(setlists.map(setlist => ({
+      ...setlist,
+      songs: setlist.songs.filter(id => id !== songId)
+    })));
   };
 
   const handleDeleteSetlist = (setlistId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este setlist?')) {
-      setSetlists(setlists.filter(s => s.id !== setlistId));
-    }
+    setSetlists(setlists.filter(s => s.id !== setlistId));
   };
 
   const handleAddToSetlist = (setlistId, songIds) => {

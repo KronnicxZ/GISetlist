@@ -90,7 +90,7 @@ const BibleVerse = () => {
   if (!verse) return null;
 
   return (
-    <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+    <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 relative">
       <div className="max-w-3xl mx-auto">
         <div className="mb-4">
           <button
@@ -108,40 +108,41 @@ const BibleVerse = () => {
             </p>
             {error && <p className="text-red-400 text-xs">{error}</p>}
           </div>
-          <div className="flex justify-end relative">
-            <div className="group">
-              <button
-                onClick={() => setShowVersionMenu(!showVersionMenu)}
-                className="text-gray-400 hover:text-white transition-colors text-xs flex items-center space-x-1"
-                title={`Versión actual: ${selectedVersion}`}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-                <span className="text-xs">{selectedVersion}</span>
-              </button>
-              {showVersionMenu && (
-                <div className="absolute right-0 mt-2 w-32 bg-gray-800 rounded-md shadow-lg py-1 z-10">
-                  {Object.keys(BIBLE_VERSIONS).map((version) => (
-                    <button
-                      key={version}
-                      onClick={() => {
-                        setSelectedVersion(version);
-                        setShowVersionMenu(false);
-                      }}
-                      className={`block w-full text-left px-4 py-2 text-xs ${
-                        selectedVersion === version
-                          ? 'text-[#FBAE00] bg-gray-700'
-                          : 'text-gray-300 hover:bg-gray-700'
-                      }`}
-                    >
-                      {version}
-                    </button>
-                  ))}
-                </div>
-              )}
+        </div>
+      </div>
+      
+      {/* Selector de versión en la esquina inferior derecha */}
+      <div className="absolute bottom-2 right-2">
+        <div className="group">
+          <button
+            onClick={() => setShowVersionMenu(!showVersionMenu)}
+            className="text-gray-500 hover:text-gray-300 transition-colors text-xs flex items-center space-x-1 opacity-50 hover:opacity-100"
+            title={`Versión actual: ${selectedVersion}`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </button>
+          {showVersionMenu && (
+            <div className="absolute bottom-0 right-0 mb-6 w-28 bg-gray-800 rounded-md shadow-lg py-1 z-10 border border-gray-700">
+              {Object.keys(BIBLE_VERSIONS).map((version) => (
+                <button
+                  key={version}
+                  onClick={() => {
+                    setSelectedVersion(version);
+                    setShowVersionMenu(false);
+                  }}
+                  className={`block w-full text-left px-3 py-1 text-xs ${
+                    selectedVersion === version
+                      ? 'text-[#FBAE00] bg-gray-700'
+                      : 'text-gray-300 hover:bg-gray-700'
+                  }`}
+                >
+                  {version}
+                </button>
+              ))}
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

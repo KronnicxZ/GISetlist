@@ -196,60 +196,6 @@ function App() {
                       </svg>
                       <span>Nuevo setlist</span>
                     </button>
-                    
-                    <div className="mt-4 space-y-2">
-                      {setlists.map((setlist) => (
-                        <div
-                          key={setlist.id}
-                          onClick={() => {
-                            setSelectedSetlist(selectedSetlist?.id === setlist.id ? null : setlist);
-                            setShowMobileMenu(false);
-                          }}
-                          className={`flex items-center justify-between group px-4 py-2 rounded-lg hover:bg-gray-800 ${
-                            selectedSetlist?.id === setlist.id ? 'bg-gray-800' : ''
-                          }`}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
-                              <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z"/>
-                              </svg>
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-white">{setlist.name}</div>
-                              <div className="text-xs text-gray-400">{setlist.songs.length} canciones</div>
-                            </div>
-                          </div>
-                          {isAdmin && (
-                            <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setEditingSetlist(setlist);
-                                  setShowSetlistForm(true);
-                                }}
-                                className="p-1 text-gray-400 hover:text-white"
-                              >
-                                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                                  <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                                </svg>
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteSetlist(setlist.id);
-                                }}
-                                className="p-1 text-gray-400 hover:text-red-500"
-                              >
-                                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                                  <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                                </svg>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
                   </div>
 
                   <button
@@ -273,6 +219,64 @@ function App() {
                   <span>Acceso admin</span>
                 </button>
               )}
+
+              {/* Sección de setlists visible para todos */}
+              <div>
+                <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">SETLISTS</h2>
+                <div className="space-y-2">
+                  {setlists.map((setlist) => (
+                    <div
+                      key={setlist.id}
+                      onClick={() => {
+                        setSelectedSetlist(selectedSetlist?.id === setlist.id ? null : setlist);
+                        setShowMobileMenu(false);
+                      }}
+                      className={`flex items-center justify-between group px-4 py-2 rounded-lg hover:bg-gray-800 ${
+                        selectedSetlist?.id === setlist.id ? 'bg-gray-800' : ''
+                      } cursor-pointer`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
+                          <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-white">{setlist.name}</div>
+                          <div className="text-xs text-gray-400">{setlist.songs.length} canciones</div>
+                        </div>
+                      </div>
+                      {isAdmin && (
+                        <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingSetlist(setlist);
+                              setShowSetlistForm(true);
+                            }}
+                            className="p-1 text-gray-400 hover:text-white"
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24">
+                              <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteSetlist(setlist.id);
+                            }}
+                            className="p-1 text-gray-400 hover:text-red-500"
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24">
+                              <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>

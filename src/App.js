@@ -8,6 +8,7 @@ import SetlistForm from './components/SetlistForm';
 import LoginModal from './components/LoginModal';
 import SortFilter from './components/SortFilter';
 import { useAuth } from './context/AuthContext';
+import BibleVerse from './components/BibleVerse';
 
 function App() {
   const [songs, setSongs] = useState(() => {
@@ -152,22 +153,20 @@ function App() {
       
       {/* Menú lateral y móvil */}
       <div className="md:relative">
-        <div className={`w-64 fixed h-full backdrop-blur-xl bg-black/80 border-r border-white/10 transform transition-transform duration-200 ease-in-out ${
+        <div className={`w-64 fixed h-full bg-black border-r border-gray-800 transform transition-transform duration-200 ease-in-out ${
           showMobileMenu ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         } z-50`}>
           <div className="p-6">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center space-x-2">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-[#FBAE00] blur-sm rounded-lg opacity-50"></div>
-                  <img src="/favicon.png" alt="GI Logo" className="w-8 h-8 relative z-10" />
-                </div>
+                <img src="/favicon.png" alt="GI Logo" className="w-8 h-8" />
                 <span className="text-xl font-semibold text-[#FBAE00]">GI Setlist</span>
               </div>
               <button 
                 className="md:hidden text-gray-400 hover:text-white"
                 onClick={() => {
                   setShowMobileMenu(false);
+                  // No reseteamos el setlist seleccionado al cerrar el menú
                 }}
               >
                 <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -242,10 +241,8 @@ function App() {
                   {setlists.map((setlist) => (
                     <div
                       key={setlist.id}
-                      className={`flex items-center justify-between group px-4 py-2 rounded-lg backdrop-blur-sm transition-all duration-200 ${
-                        selectedSetlist?.id === setlist.id 
-                          ? 'bg-white/20 shadow-lg shadow-white/10' 
-                          : 'hover:bg-white/10'
+                      className={`flex items-center justify-between group px-4 py-2 rounded-lg hover:bg-gray-800 ${
+                        selectedSetlist?.id === setlist.id ? 'bg-gray-800' : ''
                       } cursor-pointer`}
                     >
                       <div 
@@ -255,14 +252,14 @@ function App() {
                           setShowMobileMenu(false);
                         }}
                       >
-                        <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center">
-                          <svg className="w-4 h-4 text-white/70" viewBox="0 0 24 24">
+                        <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
+                          <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24">
                             <path fill="currentColor" d="M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z"/>
                           </svg>
                         </div>
                         <div>
                           <div className="text-sm font-medium text-white">{setlist.name}</div>
-                          <div className="text-xs text-white/60">{setlist.songs.length} canciones</div>
+                          <div className="text-xs text-gray-400">{setlist.songs.length} canciones</div>
                         </div>
                       </div>
                       {isAdmin && (
@@ -272,7 +269,7 @@ function App() {
                               e.stopPropagation();
                               setOpenMenuId(openMenuId === setlist.id ? null : setlist.id);
                             }}
-                            className="p-2 text-white/70 hover:text-white rounded-full hover:bg-white/10 backdrop-blur-sm transition-all duration-200"
+                            className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-700"
                           >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                               <path fill="currentColor" d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"/>
@@ -280,7 +277,7 @@ function App() {
                           </button>
                           {openMenuId === setlist.id && (
                             <div 
-                              className="absolute right-0 mt-1 w-48 backdrop-blur-xl bg-black/90 border border-white/10 rounded-lg shadow-lg shadow-black/50 z-50 py-1"
+                              className="absolute right-0 mt-1 w-48 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-50 py-1"
                             >
                               <button
                                 onClick={(e) => {
@@ -289,7 +286,7 @@ function App() {
                                   setShowSetlistForm(true);
                                   setOpenMenuId(null);
                                 }}
-                                className="w-full px-4 py-2 text-sm text-left text-white hover:bg-white/10 transition-colors duration-200 flex items-center space-x-2"
+                                className="w-full px-4 py-2 text-sm text-left text-white hover:bg-gray-800 flex items-center space-x-2"
                               >
                                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                                   <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
@@ -302,7 +299,7 @@ function App() {
                                   handleDeleteSetlist(setlist.id);
                                   setOpenMenuId(null);
                                 }}
-                                className="w-full px-4 py-2 text-sm text-left text-white hover:bg-white/10 transition-colors duration-200 flex items-center space-x-2"
+                                className="w-full px-4 py-2 text-sm text-left text-white hover:bg-gray-800 flex items-center space-x-2"
                               >
                                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                                   <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
@@ -325,10 +322,13 @@ function App() {
       {/* Contenido principal */}
       <div className="flex-1 md:ml-64">
         <div className="p-4 md:p-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 backdrop-blur-md bg-black/30 p-4 rounded-xl border border-white/10">
+          <div className="mb-8">
+            <BibleVerse />
+          </div>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <div className="flex items-center">
               <button 
-                className="md:hidden mr-4 text-white/70 hover:text-white"
+                className="md:hidden mr-4 text-gray-400"
                 onClick={() => setShowMobileMenu(true)}
               >
                 <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -336,13 +336,13 @@ function App() {
                 </svg>
               </button>
               <div className="flex items-center space-x-4">
-                <h1 className="text-2xl font-bold text-white">
+                <h1 className="text-2xl font-bold">
                   {selectedSetlist ? selectedSetlist.name : 'Canciones'}
                 </h1>
                 {selectedSetlist && (
                   <button
                     onClick={() => setSelectedSetlist(null)}
-                    className="text-white/70 hover:text-white transition-colors duration-200"
+                    className="text-gray-400 hover:text-white"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -353,9 +353,7 @@ function App() {
             </div>
             <div className="w-full md:w-auto flex items-stretch gap-4">
               <div className="flex-1 md:w-64">
-                <div className="relative">
-                  <SearchBar onSearch={setSearchTerm} />
-                </div>
+                <SearchBar onSearch={setSearchTerm} />
               </div>
               <div className="w-48">
                 <SortFilter onSortChange={setSortBy} />
@@ -366,7 +364,7 @@ function App() {
                     setEditingSong(null);
                     setShowSongForm(true);
                   }}
-                  className="h-10 bg-[#FBAE00] text-black px-4 rounded-lg font-medium flex items-center whitespace-nowrap hover:bg-[#ffc03d] transition-colors duration-200 backdrop-blur-sm"
+                  className="h-10 bg-[#FBAE00] text-black px-4 rounded-lg font-medium flex items-center whitespace-nowrap hover:bg-[#ffc03d]"
                 >
                   <span className="mr-1">+</span>
                   Nueva
@@ -375,23 +373,21 @@ function App() {
             </div>
           </div>
 
-          <div className="text-sm text-white/60 mb-4">
+          <div className="text-sm text-gray-400 mb-4">
             {filteredSongs.length} canciones
           </div>
 
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            <SongList 
-              songs={filteredSongs} 
-              onSongSelect={setSelectedSong}
-              onEditSong={isAdmin ? (song) => {
-                setEditingSong(song);
-                setShowSongForm(true);
-              } : null}
-              onDeleteSong={isAdmin ? handleDeleteSong : null}
-              setlists={isAdmin ? setlists : null}
-              onAddToSetlist={handleAddToSetlist}
-            />
-          </div>
+          <SongList 
+            songs={filteredSongs} 
+            onSongSelect={setSelectedSong}
+            onEditSong={isAdmin ? (song) => {
+              setEditingSong(song);
+              setShowSongForm(true);
+            } : null}
+            onDeleteSong={isAdmin ? handleDeleteSong : null}
+            setlists={isAdmin ? setlists : null}
+            onAddToSetlist={handleAddToSetlist}
+          />
         </div>
       </div>
 

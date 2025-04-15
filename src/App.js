@@ -145,8 +145,8 @@ function App() {
           <div className="p-6">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center space-x-2">
-                <img src="/favicon.ico" alt="GPM Logo" className="w-8 h-8" />
-                <span className="text-xl font-semibold">GPM</span>
+                <img src="/favicon.png" alt="GI Logo" className="w-8 h-8" />
+                <span className="text-xl font-semibold text-[#FBAE00]">GI Setlist</span>
               </div>
               <button 
                 className="md:hidden text-gray-400 hover:text-white"
